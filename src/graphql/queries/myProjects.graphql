@@ -1,0 +1,17 @@
+query MyProjects {
+  myProjects {
+    title
+    description
+    id
+    authorId
+    capabilities {
+      canUpdateProject
+      canDeleteProject
+      canAddTask
+      canUpdateTask
+      canDeleteTask
+      canCompleteTask
+      canManageProjectUsers
+    }
+  }
+}

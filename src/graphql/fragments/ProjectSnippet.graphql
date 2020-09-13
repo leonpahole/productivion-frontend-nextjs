@@ -1,0 +1,9 @@
+fragment ProjectSnippet on Project {
+  id
+  title
+  description
+  authorId
+  capabilities {
+    ...UserProjectCapabilitiesSnippet
+  }
+}

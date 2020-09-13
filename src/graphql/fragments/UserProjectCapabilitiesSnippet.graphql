@@ -1,0 +1,9 @@
+fragment UserProjectCapabilitiesSnippet on UserProjectCapabilitiesType {
+  canUpdateProject
+  canDeleteProject
+  canAddTask
+  canUpdateTask
+  canDeleteTask
+  canCompleteTask
+  canManageProjectUsers
+}

@@ -1,0 +1,5 @@
+mutation UpdateTask($id: Int!, $projectId: Int!, $input: CreateTaskInput!) {
+  updateTask(id: $id, projectId: $projectId, input: $input) {
+    ...TaskSnippet
+  }
+}

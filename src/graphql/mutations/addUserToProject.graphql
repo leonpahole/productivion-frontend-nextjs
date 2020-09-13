@@ -1,0 +1,5 @@
+mutation AddUserToProject($id: Int!, $input: AddUserToProjectInput!) {
+  addUserToProject(id: $id, input: $input) {
+    ...UserOnProjectSnippet
+  }
+}

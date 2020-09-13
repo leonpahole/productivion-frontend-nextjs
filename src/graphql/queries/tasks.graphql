@@ -1,0 +1,5 @@
+query Tasks($projectId: Int!, $parentTaskId: Int) {
+  tasks(projectId: $projectId, parentTaskId: $parentTaskId) {
+    ...TaskSnippet
+  }
+}

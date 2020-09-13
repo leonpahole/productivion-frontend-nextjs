@@ -1,0 +1,6 @@
+mutation CompleteTask($id: Int!, $projectId: Int!, $isCompleted: Boolean!) {
+  completeTask(id: $id, projectId: $projectId, isCompleted: $isCompleted) {
+    id
+    completed
+  }
+}

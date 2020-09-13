@@ -1,0 +1,8 @@
+fragment TaskSnippet on Task {
+  id
+  title
+  description
+  dueDate
+  createdAt
+  completed
+}

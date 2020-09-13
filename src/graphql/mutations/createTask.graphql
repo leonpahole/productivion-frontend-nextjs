@@ -1,0 +1,13 @@
+mutation CreateTask(
+  $projectId: Int!
+  $parentTaskId: Int
+  $input: CreateTaskInput!
+) {
+  createTask(
+    projectId: $projectId
+    parentTaskId: $parentTaskId
+    input: $input
+  ) {
+    ...TaskSnippet
+  }
+}

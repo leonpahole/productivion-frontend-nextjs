@@ -1,0 +1,5 @@
+query UsersOnProject($id: Int!) {
+  usersOnProject(id: $id) {
+    ...UserOnProjectSnippet
+  }
+}

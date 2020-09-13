@@ -1,0 +1,15 @@
+fragment UserOnProjectSnippet on UserOnProject {
+  userId
+  projectId
+  presetId
+  canUpdateProject
+  canDeleteProject
+  canAddTask
+  canUpdateTask
+  canDeleteTask
+  canCompleteTask
+  canManageProjectUsers
+  user {
+    ...UserSnippet
+  }
+}

@@ -1,0 +1,3 @@
+mutation RemoveUserFromProject($id: Int!, $userId: Int!) {
+  removeUserFromProject(id: $id, userId: $userId)
+}
