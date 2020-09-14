@@ -1,0 +1,20 @@
+version: "3.6"
+
+services:
+  fe_app:
+    container_name: productivion_frontend
+    image: leonpahole/productivion-frontend-nextjs:${APP_VERSION}
+    networks:
+      - traefik-global-proxy
+    environment:
+      NEXT_PUBLIC_API_URL: ${API_URL}
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.productivion-frontend.rule=Host(`${APP_DOMAIN}`)"
+      - "traefik.http.routers.productivion-frontend.entrypoints=websecure"
+      - "traefik.http.routers.productivion-frontend.tls.certresolver=letsencrypt"
+
+networks:
+  traefik-global-proxy:
+    external: true
