@@ -10,6 +10,14 @@ import { MyTextInput } from "./MyTextInput";
 import { KeyboardDatePicker } from "@material-ui/pickers";
 import { DATE_FORMAT } from "../utils/dateFormat";
 import { GraphqlTask } from "../utils/taskRenderingUtils";
+import {
+  useCreateTaskMutation,
+  useUpdateTaskMutation,
+  TaskSnippetFragmentDoc,
+} from "../generated/graphql";
+import { GraphqlProject } from "../pages/my-projects";
+import { useSnackbar } from "material-ui-snackbar-provider";
+import { NETWORK_ERROR } from "../utils/texts";
 
 export interface CreateTaskDialogResult {
   title: string;
@@ -19,19 +27,117 @@ export interface CreateTaskDialogResult {
 
 interface CreateTaskDialogProps {
   open: boolean;
-  onClose(result: CreateTaskDialogResult | null): void;
-  projectTitle: string;
+  onClose(): void;
+  project: GraphqlProject;
   task?: GraphqlTask | null;
 }
 
 export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
   open,
   onClose,
-  projectTitle,
+  project,
   task = null,
 }) => {
-  const handleClose = (result: CreateTaskDialogResult | null) => {
-    onClose(result);
+  const snackbar = useSnackbar();
+
+  const [createTask, { loading: createLoading }] = useCreateTaskMutation();
+  const [updateTask, { loading: updateLoading }] = useUpdateTaskMutation();
+
+  const loading = createLoading || updateLoading;
+  const isEdit = task != null;
+
+  const handleClose = async (result: CreateTaskDialogResult | null) => {
+    if (result) {
+      if (isEdit) {
+        await onUpdateTask(result);
+      } else {
+        await onCreateTask(result);
+      }
+
+      onClose();
+    } else {
+      onClose();
+    }
+  };
+
+  const onUpdateTask = async (result: CreateTaskDialogResult) => {
+    if (!task) {
+      return;
+    }
+
+    try {
+      const updateResult = await updateTask({
+        variables: {
+          id: task.id,
+          projectId: project.id,
+          input: {
+            title: result.title,
+            description: result.description || null,
+            dueDate: result.dueDate,
+          },
+        },
+      });
+
+      if (result && updateResult.data?.updateTask) {
+        snackbar.showMessage(
+          `Task ${updateResult.data.updateTask.title} updated!`
+        );
+      }
+    } catch (e) {
+      snackbar.showMessage(NETWORK_ERROR);
+    }
+  };
+
+  const onCreateTask = async (result: CreateTaskDialogResult) => {
+    try {
+      const createTaskResult = await createTask({
+        variables: {
+          projectId: project.id,
+          parentTaskId: null,
+          input: {
+            title: result.title,
+            description: result.description || null,
+            dueDate: result.dueDate,
+          },
+        },
+        update: (cache, { data }) => {
+          if (data && data.createTask) {
+            cache.modify({
+              fields: {
+                tasks(existingTasks = []) {
+                  const newTaskRef = cache.writeFragment({
+                    data: data.createTask,
+                    variables: {
+                      projectId: project.id,
+                      parentTaskId: null,
+                    },
+                    fragment: TaskSnippetFragmentDoc,
+                    fragmentName: "TaskSnippet",
+                  });
+                  return [newTaskRef, ...existingTasks];
+                },
+              },
+            });
+          }
+        },
+      });
+
+      if (
+        !createTaskResult ||
+        createTaskResult.errors ||
+        !createTaskResult.data ||
+        !createTaskResult.data.createTask
+      ) {
+        return;
+      }
+
+      snackbar.showMessage(
+        `Task ${createTaskResult.data.createTask.title} created!`
+      );
+    } catch (e) {
+      console.log(e);
+      snackbar.showMessage(NETWORK_ERROR);
+    }
   };
 
   return (
@@ -46,12 +152,13 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title">
-          {task == null && (
+          {isEdit ? (
+            <div>Update a task {task!.title}</div>
+          ) : (
             <div>
-              Create a task on project <b>{projectTitle}</b>
+              Create a task on project <b>{project.title}</b>
             </div>
           )}
-          {task != null && <div>Update a task {task.title}</div>}
         </DialogTitle>
         <DialogContent>
           <Formik
@@ -68,7 +175,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
               description: Yup.string()
                 .min(4, "Description should be at least 4 letters long!")
                 .max(250, "Description shouldn't be longer than 250 letters!"),
-              dueDate: Yup.date(),
+              dueDate: Yup.date().nullable(),
             })}
             onSubmit={async (values) => {
               handleClose(values);
@@ -116,6 +223,7 @@ export const CreateTaskDialog: React.FC<CreateTaskDialogProps> = ({
             onClick={() => {
               handleClose(null);
             }}
+            disabled={loading}
             color="primary"
           >
             Cancel

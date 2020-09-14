@@ -1,0 +1,5 @@
+query Task($id: Int!, $projectId: Int!) {
+  task(id: $id, projectId: $projectId) {
+    ...TaskSnippet
+  }
+}

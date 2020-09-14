@@ -1,4 +1,4 @@
-import { Button } from "@material-ui/core";
+import { Button, CircularProgress } from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -6,20 +6,54 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import React from "react";
 import { GraphqlTask } from "../utils/taskRenderingUtils";
+import { useSnackbar } from "material-ui-snackbar-provider";
+import { useDeleteTaskMutation, Task } from "../generated/graphql";
+import { NETWORK_ERROR } from "../utils/texts";
 
 interface DeleteTaskDialogProps {
   open: boolean;
   task: GraphqlTask | null;
-  onClose(confirm: boolean): void;
+  projectId: number;
+  onClose(): void;
 }
 
 export const DeleteTaskDialog: React.FC<DeleteTaskDialogProps> = ({
   open,
   task,
   onClose,
+  projectId,
 }) => {
-  const handleClose = (confirm: boolean) => {
-    onClose(confirm);
+  const snackbar = useSnackbar();
+  const [deleteTask, { loading }] = useDeleteTaskMutation();
+
+  const handleClose = async (confirm: boolean) => {
+    if (confirm && task) {
+      try {
+        await deleteTask({
+          variables: { id: task.id, projectId },
+          update: (cache, { data }) => {
+            if (data?.deleteTask) {
+              cache.modify({
+                fields: {
+                  tasks(existingTaskRefs: Task[] = [], { readField }) {
+                    return existingTaskRefs.filter((taskRef) => {
+                      return task.id !== readField("id", taskRef);
+                    });
+                  },
+                },
+              });
+            }
+          },
+        });
+        snackbar.showMessage(`Task ${task.title} deleted!`);
+      } catch (e) {
+        snackbar.showMessage(NETWORK_ERROR);
+      }
+
+      onClose();
+    } else {
+      onClose();
+    }
   };
 
   return (
@@ -35,7 +69,11 @@ export const DeleteTaskDialog: React.FC<DeleteTaskDialogProps> = ({
       >
         <DialogTitle id="form-dialog-title">Confirm delete</DialogTitle>
         <DialogContent>
-          <DialogContentText>Delete task {task?.title}?</DialogContentText>
+          {loading || !task ? (
+            <CircularProgress />
+          ) : (
+            <DialogContentText>Delete task {task.title}?</DialogContentText>
+          )}
         </DialogContent>
         <DialogActions>
           <Button
@@ -43,6 +81,7 @@ export const DeleteTaskDialog: React.FC<DeleteTaskDialogProps> = ({
               handleClose(false);
             }}
             color="primary"
+            disabled={loading}
           >
             No
           </Button>
@@ -51,6 +90,7 @@ export const DeleteTaskDialog: React.FC<DeleteTaskDialogProps> = ({
               handleClose(true);
             }}
             color="secondary"
+            disabled={loading}
           >
             Yes
           </Button>

@@ -1,5 +1,4 @@
 import {
-  Checkbox,
   CircularProgress,
   IconButton,
   List,
@@ -10,21 +9,21 @@ import {
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
-import { useSnackbar } from "material-ui-snackbar-provider";
-import { useCompleteTaskMutation, useTasksQuery } from "../generated/graphql";
+import { useTasksQuery } from "../generated/graphql";
+import { GraphqlProjectCapabilities } from "../pages/my-projects";
 import {
   dueDateColorWarning,
   getCompletedTextStyle,
-  renderDueDate,
   GraphqlTask,
+  renderDueDate,
 } from "../utils/taskRenderingUtils";
-import { NETWORK_ERROR } from "../utils/texts";
-import { GraphqlProjectCapabilities } from "../pages/my-projects";
+import { TaskCompleteCheckbox } from "./TaskCompleteCheckbox";
 
 interface TaskListProps {
   projectId: number;
   onTaskDelete(task: GraphqlTask): void;
   onTaskEdit(task: GraphqlTask): void;
+  onTaskClick(task: GraphqlTask): void;
   capabilities: GraphqlProjectCapabilities;
 }
 
@@ -36,6 +35,7 @@ const useTaskStyles = makeStyles({
 
 export const TaskList: React.FC<TaskListProps> = ({
   projectId,
+  onTaskClick,
   onTaskDelete,
   onTaskEdit,
   capabilities,
@@ -45,30 +45,6 @@ export const TaskList: React.FC<TaskListProps> = ({
   });
 
   const classes = useTaskStyles();
-
-  const [completeTask] = useCompleteTaskMutation();
-  const snackbar = useSnackbar();
-
-  const onTaskChecked = async (
-    taskId: number,
-    taskTitle: string,
-    state: boolean
-  ) => {
-    try {
-      const result = await completeTask({
-        variables: { id: taskId, projectId, isCompleted: state },
-      });
-
-      if (result.data?.completeTask) {
-        let stateStr = result.data?.completeTask.completed
-          ? "completed"
-          : "uncompleted";
-        snackbar.showMessage(`Task ${taskTitle} marked ${stateStr}!`);
-      }
-    } catch (e) {
-      snackbar.showMessage(NETWORK_ERROR);
-    }
-  };
 
   if (loading) {
     return <CircularProgress />;
@@ -90,24 +66,24 @@ export const TaskList: React.FC<TaskListProps> = ({
                 style: {
                   whiteSpace: "normal",
                   textDecoration: getCompletedTextStyle(task),
+                  cursor: "pointer",
                 },
+              }}
+              onClick={() => {
+                onTaskClick(task);
               }}
               primary={`${task.title}`}
               secondary={renderDueDate(task)}
               secondaryTypographyProps={{
-                style: { color: dueDateColorWarning(task) },
+                style: { color: dueDateColorWarning(task), cursor: "pointer" },
               }}
               className={task.completed ? classes.completed : ""}
             />
             <ListItemSecondaryAction>
-              <Checkbox
-                edge="end"
-                inputProps={{ "aria-labelledby": labelId }}
-                checked={task.completed}
-                disabled={!capabilities.canCompleteTask}
-                onChange={(event) =>
-                  onTaskChecked(task.id, task.title, event.target.checked)
-                }
+              <TaskCompleteCheckbox
+                capabilities={capabilities}
+                projectId={projectId}
+                task={task}
               />
               {capabilities.canUpdateTask && (
                 <IconButton
