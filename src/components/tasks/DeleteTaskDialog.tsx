@@ -5,16 +5,16 @@ import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import React from "react";
-import { GraphqlTask } from "../utils/taskRenderingUtils";
+import { GraphqlTask } from "../../utils/taskRenderingUtils";
 import { useSnackbar } from "material-ui-snackbar-provider";
-import { useDeleteTaskMutation, Task } from "../generated/graphql";
-import { NETWORK_ERROR } from "../utils/texts";
+import { useDeleteTaskMutation, Task } from "../../generated/graphql";
+import { NETWORK_ERROR } from "../../utils/texts";
 
 interface DeleteTaskDialogProps {
   open: boolean;
   task: GraphqlTask | null;
   projectId: number;
-  onClose(): void;
+  onClose(deleted: boolean): void;
 }
 
 export const DeleteTaskDialog: React.FC<DeleteTaskDialogProps> = ({
@@ -33,15 +33,7 @@ export const DeleteTaskDialog: React.FC<DeleteTaskDialogProps> = ({
           variables: { id: task.id, projectId },
           update: (cache, { data }) => {
             if (data?.deleteTask) {
-              cache.modify({
-                fields: {
-                  tasks(existingTaskRefs: Task[] = [], { readField }) {
-                    return existingTaskRefs.filter((taskRef) => {
-                      return task.id !== readField("id", taskRef);
-                    });
-                  },
-                },
-              });
+              cache.evict({ id: cache.identify(task) });
             }
           },
         });
@@ -50,9 +42,9 @@ export const DeleteTaskDialog: React.FC<DeleteTaskDialogProps> = ({
         snackbar.showMessage(NETWORK_ERROR);
       }
 
-      onClose();
+      onClose(true);
     } else {
-      onClose();
+      onClose(false);
     }
   };
 
@@ -80,7 +72,7 @@ export const DeleteTaskDialog: React.FC<DeleteTaskDialogProps> = ({
             onClick={() => {
               handleClose(false);
             }}
-            color="primary"
+            color="default"
             disabled={loading}
           >
             No

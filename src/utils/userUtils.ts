@@ -1,3 +1,4 @@
+// ADD CAPABILITY
 export interface UserCapabilities {
   canUpdateProject: boolean;
   canDeleteProject: boolean;
@@ -6,6 +7,9 @@ export interface UserCapabilities {
   canDeleteTask: boolean;
   canCompleteTask: boolean;
   canManageProjectUsers: boolean;
+  canComment: boolean;
+  canUpdateOtherComments: boolean;
+  canDeleteOtherComments: boolean;
 }
 
 interface RoleInfo {
@@ -24,6 +28,9 @@ export const RolePresets: Record<number, RoleInfo> = {
       canDeleteTask: false,
       canCompleteTask: false,
       canManageProjectUsers: false,
+      canComment: false,
+      canUpdateOtherComments: false,
+      canDeleteOtherComments: false,
     },
   },
   1: {
@@ -36,6 +43,9 @@ export const RolePresets: Record<number, RoleInfo> = {
       canDeleteTask: true,
       canCompleteTask: true,
       canManageProjectUsers: true,
+      canComment: true,
+      canUpdateOtherComments: true,
+      canDeleteOtherComments: true,
     },
   },
   2: {
@@ -48,6 +58,9 @@ export const RolePresets: Record<number, RoleInfo> = {
       canDeleteTask: true,
       canCompleteTask: true,
       canManageProjectUsers: false,
+      canComment: true,
+      canUpdateOtherComments: false,
+      canDeleteOtherComments: false,
     },
   },
   3: {
@@ -60,6 +73,9 @@ export const RolePresets: Record<number, RoleInfo> = {
       canDeleteTask: false,
       canCompleteTask: true,
       canManageProjectUsers: false,
+      canComment: true,
+      canUpdateOtherComments: false,
+      canDeleteOtherComments: false,
     },
   },
   4: {
@@ -72,6 +88,9 @@ export const RolePresets: Record<number, RoleInfo> = {
       canDeleteTask: false,
       canCompleteTask: false,
       canManageProjectUsers: false,
+      canComment: false,
+      canUpdateOtherComments: false,
+      canDeleteOtherComments: false,
     },
   },
 };

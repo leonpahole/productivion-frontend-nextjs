@@ -1,9 +1,9 @@
 import { Checkbox } from "@material-ui/core";
 import { useSnackbar } from "material-ui-snackbar-provider";
-import { useCompleteTaskMutation } from "../generated/graphql";
-import { GraphqlProjectCapabilities } from "../pages/my-projects";
-import { GraphqlTask } from "../utils/taskRenderingUtils";
-import { NETWORK_ERROR } from "../utils/texts";
+import { useCompleteTaskMutation } from "../../generated/graphql";
+import { GraphqlProjectCapabilities } from "../../pages/my-projects";
+import { GraphqlTask } from "../../utils/taskRenderingUtils";
+import { NETWORK_ERROR } from "../../utils/texts";
 
 interface TaskCompleteCheckboxProps {
   task: GraphqlTask;

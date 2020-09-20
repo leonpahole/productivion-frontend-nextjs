@@ -30,6 +30,12 @@ interface AddUserToProjectDialogProps {
   userOnProject?: GraphqlUserOnProject | null;
 }
 
+interface AddUserToProjectInput {
+  email: string;
+  rolePresetId: number;
+  capabilities: UserCapabilities;
+}
+
 export const AddUserToProjectDialog: React.FC<AddUserToProjectDialogProps> = ({
   open,
   onClose,
@@ -84,29 +90,41 @@ export const AddUserToProjectDialog: React.FC<AddUserToProjectDialogProps> = ({
           </div>
         </DialogTitle>
         <DialogContent>
-          <Formik
+          <Formik<AddUserToProjectInput>
+            validateOnBlur={false}
             initialValues={{
               email: userOnProject ? userOnProject.user.email : "",
               rolePresetId: userOnProject ? userOnProject.presetId || 0 : 0,
               capabilities: {
                 canUpdateProject: userOnProject
-                  ? userOnProject.canUpdateProject
+                  ? userOnProject.capabilities.canUpdateProject
                   : false,
                 canDeleteProject: userOnProject
-                  ? userOnProject.canDeleteProject
+                  ? userOnProject.capabilities.canDeleteProject
                   : false,
-                canAddTask: userOnProject ? userOnProject.canAddTask : false,
+                canAddTask: userOnProject
+                  ? userOnProject.capabilities.canAddTask
+                  : false,
                 canUpdateTask: userOnProject
-                  ? userOnProject.canUpdateTask
+                  ? userOnProject.capabilities.canUpdateTask
                   : false,
                 canDeleteTask: userOnProject
-                  ? userOnProject.canDeleteTask
+                  ? userOnProject.capabilities.canDeleteTask
                   : false,
                 canCompleteTask: userOnProject
-                  ? userOnProject.canCompleteTask
+                  ? userOnProject.capabilities.canCompleteTask
                   : false,
                 canManageProjectUsers: userOnProject
-                  ? userOnProject.canManageProjectUsers
+                  ? userOnProject.capabilities.canManageProjectUsers
+                  : false,
+                canComment: userOnProject
+                  ? userOnProject.capabilities.canComment
+                  : false,
+                canUpdateOtherComments: userOnProject
+                  ? userOnProject.capabilities.canUpdateOtherComments
+                  : false,
+                canDeleteOtherComments: userOnProject
+                  ? userOnProject.capabilities.canDeleteOtherComments
                   : false,
               },
             }}
@@ -163,7 +181,7 @@ export const AddUserToProjectDialog: React.FC<AddUserToProjectDialogProps> = ({
             onClick={() => {
               handleClose(null);
             }}
-            color="primary"
+            color="default"
           >
             Cancel
           </Button>

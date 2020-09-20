@@ -58,6 +58,19 @@ const capabilities: CapabilityDescription[] = [
     name: "canManageProjectUsers",
     description: "Can manage project users",
   },
+  {
+    name: "canComment",
+    description: "Can comment",
+  },
+  {
+    name: "canUpdateOtherComments",
+    description: "Can update other user's comments",
+  },
+  {
+    name: "canDeleteOtherComments",
+    description: "Can delete other user's comments",
+  },
+  // ADD CAPABILITY
 ];
 
 export const CapabilitiesFormControl: React.FC<CapabilitiesFormControlProps> = ({
@@ -72,10 +85,11 @@ export const CapabilitiesFormControl: React.FC<CapabilitiesFormControlProps> = (
     <FormControl component="fieldset" className={classes.formControl}>
       <FormLabel component="legend">Capabilities</FormLabel>
       <FormGroup>
-        {capabilities.map((c) => {
+        {capabilities.map((c, index) => {
           const name = `capabilities.${c.name}`;
           return (
             <MyCheckbox
+              key={index}
               disabled={isUserAdmin}
               label={c.description}
               name={name}

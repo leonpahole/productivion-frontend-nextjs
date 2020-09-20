@@ -1,8 +1,9 @@
-import { TasksQuery } from "../generated/graphql";
+import { TasksQuery, CommentsQuery } from "../generated/graphql";
 import moment from "moment";
 import { DATE_FORMAT } from "./dateFormat";
 
 export type GraphqlTask = TasksQuery["tasks"][0];
+export type GraphqlComment = CommentsQuery["comments"][0];
 
 export const getCompletedTextStyle = (task: GraphqlTask): string => {
   if (task.completed) {

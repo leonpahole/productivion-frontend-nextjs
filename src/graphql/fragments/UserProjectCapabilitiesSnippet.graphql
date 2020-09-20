@@ -1,3 +1,4 @@
+# ADD CAPABILITY
 fragment UserProjectCapabilitiesSnippet on UserProjectCapabilitiesType {
   canUpdateProject
   canDeleteProject
@@ -6,4 +7,7 @@ fragment UserProjectCapabilitiesSnippet on UserProjectCapabilitiesType {
   canDeleteTask
   canCompleteTask
   canManageProjectUsers
+  canComment
+  canUpdateOtherComments
+  canDeleteOtherComments
 }

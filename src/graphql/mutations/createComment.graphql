@@ -1,0 +1,9 @@
+mutation CreateComment(
+  $projectId: Int!
+  $taskId: Int
+  $input: CreateCommentInput!
+) {
+  createComment(projectId: $projectId, taskId: $taskId, input: $input) {
+    ...CommentSnippet
+  }
+}

@@ -1,5 +1,13 @@
-query Tasks($projectId: Int!, $parentTaskId: Int) {
-  tasks(projectId: $projectId, parentTaskId: $parentTaskId) {
-    ...TaskSnippet
+query Tasks($projectId: Int!, $offset: Int!, $limit: Int!, $parentTaskId: Int) {
+  tasks(
+    projectId: $projectId
+    offset: $offset
+    limit: $limit
+    parentTaskId: $parentTaskId
+  ) {
+    hasMore
+    tasks {
+      ...TaskSnippet
+    }
   }
 }

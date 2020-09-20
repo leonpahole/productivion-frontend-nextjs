@@ -1,0 +1,5 @@
+query Comments($projectId: Int!, $taskId: Int) {
+  comments(projectId: $projectId, taskId: $taskId) {
+    ...CommentSnippet
+  }
+}

@@ -1,36 +1,25 @@
 import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
+  Box,
   CircularProgress,
   Container,
   makeStyles,
   Typography,
 } from "@material-ui/core";
-import { useSnackbar } from "material-ui-snackbar-provider";
-import React, { useState } from "react";
-import {
-  useMyProjectsQuery,
-  useDeleteProjectMutation,
-  MyProjectsQuery,
-  Project,
-} from "../generated/graphql";
-import { ConfirmDeleteProjectDialog } from "../components/ConfirmDeleteProjectDialog";
-import { NETWORK_ERROR } from "../utils/texts";
-import { ButtonLink } from "../components/ButtonLink";
+import React from "react";
+import { ProjectList } from "../components/projects/ProjectList";
+import { MyProjectsQuery, useMyProjectsQuery } from "../generated/graphql";
+import { CreateProjectButton } from "../components/projects/CreateProjectButton";
 
 const useStyles = makeStyles((theme) => ({
-  root: {
-    marginTop: theme.spacing(8),
-    marginBottom: theme.spacing(3),
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
+  heading: {
+    [theme.breakpoints.down("xs")]: {
+      fontSize: theme.typography.h3.fontSize,
+    },
   },
-  card: {
+  image: {
     width: "100%",
-    margin: theme.spacing(2),
+    height: "auto",
+    maxWidth: 400,
   },
 }));
 
@@ -39,122 +28,64 @@ export type GraphqlProjectCapabilities = MyProjectsQuery["myProjects"][0]["capab
 
 const MyProjects: React.FC<{}> = ({}) => {
   const { data, loading, error } = useMyProjectsQuery();
-  const [deleteProject] = useDeleteProjectMutation();
 
-  const classes = useStyles();
-  const snackbar = useSnackbar();
-
-  const [toDeleteProject, setToDeleteProject] = useState<GraphqlProject | null>(
-    null
-  );
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-
-  const openDeleteDialog = (project: GraphqlProject) => {
-    setDeleteDialogOpen(true);
-    setToDeleteProject(project);
-  };
-
-  const onDeleteDialogClose = async (confirmed: boolean) => {
-    setDeleteDialogOpen(false);
-
-    if (confirmed && toDeleteProject != null) {
-      try {
-        await deleteProject({
-          variables: { id: toDeleteProject.id },
-          update: (cache, { data }) => {
-            if (data?.deleteProject) {
-              cache.modify({
-                fields: {
-                  myProjects(
-                    existingProjectRefs: Project[] = [],
-                    { readField }
-                  ) {
-                    return existingProjectRefs.filter((projectRef) => {
-                      return toDeleteProject.id !== readField("id", projectRef);
-                    });
-                  },
-                },
-              });
-            }
-          },
-        });
-
-        snackbar.showMessage("Project deleted!");
-      } catch (e) {
-        console.log(e);
-        snackbar.showMessage(NETWORK_ERROR);
-      }
-
-      setToDeleteProject(null);
-    }
-  };
+  const styles = useStyles();
 
   if (loading) {
-    return <CircularProgress />;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center">
+        <CircularProgress />
+      </Box>
+    );
   }
 
-  if (error || !data?.myProjects) {
-    return <p>Error</p>;
-  }
-
-  if (data.myProjects.length === 0) {
-    return <p>No projects</p>;
+  if (error || !data?.myProjects || data.myProjects.length === 0) {
+    return (
+      <>
+        <Container component="main" maxWidth="sm">
+          <Typography
+            component="h1"
+            variant="h2"
+            align="center"
+            className={styles.heading}
+          >
+            No projects yet
+          </Typography>
+          <Box mt={3} mb={4} display="flex" justifyContent="center">
+            <img className={styles.image} src="/todo-no-projects.png" />
+          </Box>
+          <Box>
+            <Typography component="h2" variant="subtitle1" align="center">
+              Projects help you organize your tasks into units. Each projects
+              can hold multiple collaborators.
+            </Typography>
+          </Box>
+          <Box mt={2} display="flex" justifyContent="center">
+            <CreateProjectButton variant="button" />
+          </Box>
+        </Container>
+        <CreateProjectButton variant="fab" />
+      </>
+    );
   }
 
   return (
     <>
-      <Container className={classes.root} component="main" maxWidth="md">
-        <Typography component="h1" variant="h5">
-          My projects
-        </Typography>
-        {data.myProjects.map((p) => (
-          <Card className={classes.card} key={p.id} variant="outlined">
-            <CardContent>
-              <Typography variant="h5" component="h2">
-                {p.title}
-              </Typography>
-              <Typography color="textSecondary">{p.description}</Typography>
-            </CardContent>
-            <CardActions>
-              <Button
-                component={ButtonLink}
-                href="/project/[pid]"
-                as={`/project/${p.id}`}
-                color="inherit"
-              >
-                Details
-              </Button>
+      <Container component="main" maxWidth="md">
+        <Box mb={3}>
+          <Typography
+            component="h1"
+            variant="h2"
+            align="center"
+            className={styles.heading}
+          >
+            Your projects
+          </Typography>
+        </Box>
 
-              {p.capabilities.canUpdateProject && (
-                <Button
-                  component={ButtonLink}
-                  href="/update-project/[pid]"
-                  as={`/update-project/${p.id}`}
-                  color="inherit"
-                >
-                  Edit
-                </Button>
-              )}
-
-              {p.capabilities.canDeleteProject && (
-                <Button
-                  onClick={() => {
-                    openDeleteDialog(p);
-                  }}
-                  size="small"
-                >
-                  Delete
-                </Button>
-              )}
-            </CardActions>
-          </Card>
-        ))}
+        <ProjectList projects={data.myProjects} />
       </Container>
-      <ConfirmDeleteProjectDialog
-        open={deleteDialogOpen}
-        projectTitle={toDeleteProject ? toDeleteProject.title : ""}
-        onClose={onDeleteDialogClose}
-      />
+      <CreateProjectButton variant="fab" />
     </>
   );
 };

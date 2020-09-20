@@ -13,6 +13,7 @@ import {
   Theme,
   Toolbar,
   Typography,
+  Box,
 } from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
 import { TransitionProps } from "@material-ui/core/transitions/transition";
@@ -27,6 +28,7 @@ import {
   useUsersOnProjectQuery,
   useRemoveUserFromProjectMutation,
   UserOnProject,
+  useMeQuery,
 } from "../generated/graphql";
 import { GraphqlProject } from "../pages/my-projects";
 import { AppError } from "../types/AppError";
@@ -39,6 +41,7 @@ import {
 
 import EditIcon from "@material-ui/icons/Edit";
 import { DeleteUserOnProjectDialog } from "./DeleteUserOnProjectDialog";
+import { Loading } from "./shared/Loading";
 
 export type GraphqlUserOnProject = UsersOnProjectQuery["usersOnProject"][0];
 
@@ -69,13 +72,16 @@ const useStyles = makeStyles((theme: Theme) =>
 
 interface UserManagementDialogProps {
   project: GraphqlProject;
+  open: boolean;
+  onClose(): void;
 }
 
 export const UserManagementDialog: React.FC<UserManagementDialogProps> = ({
   project,
+  open,
+  onClose,
 }) => {
   const classes = useStyles();
-  const [open, setOpen] = useState(false);
   const snackbar = useSnackbar();
 
   const [addUserToProjectDialogOpen, setAddUserToProjectDialogOpen] = useState(
@@ -102,7 +108,9 @@ export const UserManagementDialog: React.FC<UserManagementDialogProps> = ({
     setUserOnProjectToEdit,
   ] = useState<GraphqlUserOnProject | null>(null);
 
-  const { data, loading } = useUsersOnProjectQuery({
+  const { data: meData, loading: meLoading, error: meError } = useMeQuery();
+
+  const { data, loading, error } = useUsersOnProjectQuery({
     variables: { id: project.id },
     skip: !open,
   });
@@ -123,7 +131,7 @@ export const UserManagementDialog: React.FC<UserManagementDialogProps> = ({
   const onDeleteUserOnProjectDialogClose = async (confirmed: boolean) => {
     if (confirmed && userOnProjectToDelete) {
       try {
-        const userIdToDelete = userOnProjectToDelete.userId;
+        const userIdToDelete = userOnProjectToDelete.user.id;
         const projectIdToDelete = userOnProjectToDelete.projectId;
         await removeUserFromProject({
           variables: {
@@ -140,7 +148,7 @@ export const UserManagementDialog: React.FC<UserManagementDialogProps> = ({
                   ) {
                     return existingUsersOnproject.filter((userRef) => {
                       return !(
-                        userIdToDelete === readField("userId", userRef) &&
+                        userIdToDelete === readField("id", userRef.user) &&
                         projectIdToDelete === readField("projectId", userRef)
                       );
                     });
@@ -162,12 +170,8 @@ export const UserManagementDialog: React.FC<UserManagementDialogProps> = ({
     setUserOnProjectToDelete(null);
   };
 
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
   const handleClose = () => {
-    setOpen(false);
+    onClose();
   };
 
   const openAddUserToProjectDialog = () => {
@@ -207,6 +211,7 @@ export const UserManagementDialog: React.FC<UserManagementDialogProps> = ({
                       fragment: UserOnProjectSnippetFragmentDoc,
                       fragmentName: "UserOnProjectSnippet",
                     });
+                    console.log(newUserRef);
                     return [newUserRef, ...existingUsers];
                   },
                 },
@@ -261,60 +266,48 @@ export const UserManagementDialog: React.FC<UserManagementDialogProps> = ({
     }
   };
 
-  return (
-    <div>
-      <Button variant="outlined" color="primary" onClick={handleClickOpen}>
-        User management
-      </Button>
+  if (!data || !meData || error || meError) {
+    return null;
+  }
 
-      <Dialog
-        fullScreen
-        open={open}
-        onClose={handleClose}
-        TransitionComponent={Transition}
-      >
-        {loading ? (
-          <CircularProgress />
-        ) : (
-          <div>
-            <AppBar className={classes.appBar}>
+  return (
+    <Dialog
+      fullScreen
+      open={open}
+      onClose={handleClose}
+      TransitionComponent={Transition}
+    >
+      {loading || meLoading ? (
+        <Loading />
+      ) : (
+        <div>
+          <AppBar className={classes.appBar}>
+            <Box pt={1} pb={1}>
               <Toolbar>
-                <IconButton
-                  edge="start"
-                  color="inherit"
-                  onClick={handleClose}
-                  aria-label="close"
-                >
+                <IconButton color="inherit" onClick={handleClose}>
                   <CloseIcon />
                 </IconButton>
                 <Typography variant="h6" className={classes.title}>
-                  User management - project {project.title}
+                  {project.title} - user management
                 </Typography>
                 <Button color="inherit" onClick={openAddUserToProjectDialog}>
                   Add a user
                 </Button>
               </Toolbar>
-            </AppBar>
-            <List>
-              {data?.usersOnProject.map((userOnProject) => {
-                return (
-                  <ListItem>
-                    <ListItemText
-                      primary={userOnProject.user.email}
-                      secondary={renderRoleName(userOnProject.presetId)}
-                    />
-                    <ListItemSecondaryAction>
-                      {!isAdmin(userOnProject.presetId) && (
-                        <IconButton
-                          onClick={() => {
-                            onUserOnProjectDelete(userOnProject);
-                          }}
-                          edge="end"
-                          aria-label="delete"
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      )}
+            </Box>
+          </AppBar>
+          <List>
+            {data?.usersOnProject.map((userOnProject) => {
+              const isMe = userOnProject.user.id === meData.me.id;
+
+              return (
+                <ListItem>
+                  <ListItemText
+                    primary={userOnProject.user.email}
+                    secondary={renderRoleName(userOnProject.presetId)}
+                  />
+                  <ListItemSecondaryAction>
+                    {!isMe && (
                       <IconButton
                         onClick={() => {
                           onUserOnProjectEdit(userOnProject);
@@ -324,33 +317,45 @@ export const UserManagementDialog: React.FC<UserManagementDialogProps> = ({
                       >
                         <EditIcon />
                       </IconButton>
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                );
-              })}
-            </List>
+                    )}
+                    {!isMe && (
+                      <IconButton
+                        onClick={() => {
+                          onUserOnProjectDelete(userOnProject);
+                        }}
+                        edge="end"
+                        color="secondary"
+                        aria-label="delete"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    )}
+                  </ListItemSecondaryAction>
+                </ListItem>
+              );
+            })}
+          </List>
 
-            <AddUserToProjectDialog
-              open={addUserToProjectDialogOpen}
-              projectTitle={project.title}
-              onClose={onAddUserToProjectDialogClose}
-            />
+          <AddUserToProjectDialog
+            open={addUserToProjectDialogOpen}
+            projectTitle={project.title}
+            onClose={onAddUserToProjectDialogClose}
+          />
 
-            <AddUserToProjectDialog
-              open={editUserToProjectDialogOpen}
-              projectTitle={project.title}
-              onClose={onAddUserToProjectDialogClose}
-              userOnProject={userOnProjectToEdit}
-            />
+          <AddUserToProjectDialog
+            open={editUserToProjectDialogOpen}
+            projectTitle={project.title}
+            onClose={onAddUserToProjectDialogClose}
+            userOnProject={userOnProjectToEdit}
+          />
 
-            <DeleteUserOnProjectDialog
-              open={deleteUserOnProjectDialogOpen}
-              onClose={onDeleteUserOnProjectDialogClose}
-              userOnProject={userOnProjectToDelete}
-            />
-          </div>
-        )}
-      </Dialog>
-    </div>
+          <DeleteUserOnProjectDialog
+            open={deleteUserOnProjectDialogOpen}
+            onClose={onDeleteUserOnProjectDialogClose}
+            userOnProject={userOnProjectToDelete}
+          />
+        </div>
+      )}
+    </Dialog>
   );
 };

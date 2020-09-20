@@ -1,0 +1,9 @@
+mutation UpdateComment(
+  $id: Int!
+  $projectId: Int!
+  $input: CreateCommentInput!
+) {
+  updateComment(id: $id, projectId: $projectId, input: $input) {
+    ...CommentSnippet
+  }
+}

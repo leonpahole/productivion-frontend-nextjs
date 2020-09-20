@@ -3,6 +3,9 @@ fragment ProjectSnippet on Project {
   title
   description
   authorId
+  createdAt
+  taskCount
+  userCount
   capabilities {
     ...UserProjectCapabilitiesSnippet
   }

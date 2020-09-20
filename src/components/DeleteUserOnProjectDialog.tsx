@@ -44,7 +44,7 @@ export const DeleteUserOnProjectDialog: React.FC<DeleteUserOnProjectDialogProps>
             onClick={() => {
               handleClose(false);
             }}
-            color="primary"
+            color="default"
           >
             No
           </Button>
