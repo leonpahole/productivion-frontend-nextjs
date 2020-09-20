@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress } from "@material-ui/core";
+import { Box, Button } from "@material-ui/core";
 import { Formik } from "formik";
 import { useSnackbar } from "material-ui-snackbar-provider";
 import * as Yup from "yup";
@@ -9,6 +9,7 @@ import {
 } from "../generated/graphql";
 import { NETWORK_ERROR } from "../utils/texts";
 import { MyTextInput } from "./MyTextInput";
+import { Loading } from "./shared/Loading";
 
 interface CommentInputProps {
   projectId: number;
@@ -26,7 +27,7 @@ export const CommentInput: React.FC<CommentInputProps> = ({
   const [createComment] = useCreateCommentMutation();
 
   if (meLoading) {
-    return <CircularProgress />;
+    return <Loading />;
   }
 
   if (meError != null || meData == null || !meData.me) {

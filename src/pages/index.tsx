@@ -1,13 +1,7 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  makeStyles,
-  Theme,
-  Typography,
-} from "@material-ui/core";
+import { Box, Button, makeStyles, Theme, Typography } from "@material-ui/core";
 import { ButtonLink } from "../components/ButtonLink";
 import { useMeQuery } from "../generated/graphql";
+import { Loading } from "../components/shared/Loading";
 
 const useStyles = makeStyles((theme: Theme) => ({
   root: {
@@ -73,7 +67,7 @@ export default function Home() {
   const styles = useStyles();
 
   if (loading) {
-    return <CircularProgress />;
+    return <Loading />;
   }
 
   const notLoggedIn = error || !data?.me;

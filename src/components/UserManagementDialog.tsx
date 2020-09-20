@@ -1,7 +1,7 @@
 import {
   AppBar,
+  Box,
   Button,
-  CircularProgress,
   createStyles,
   IconButton,
   List,
@@ -13,33 +13,31 @@ import {
   Theme,
   Toolbar,
   Typography,
-  Box,
 } from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
 import { TransitionProps } from "@material-ui/core/transitions/transition";
 import CloseIcon from "@material-ui/icons/Close";
 import DeleteIcon from "@material-ui/icons/Delete";
+import EditIcon from "@material-ui/icons/Edit";
 import { useSnackbar } from "material-ui-snackbar-provider";
 import React, { useState } from "react";
 import {
   useAddUserToProjectMutation,
+  useMeQuery,
+  useRemoveUserFromProjectMutation,
+  UserOnProject,
   UserOnProjectSnippetFragmentDoc,
   UsersOnProjectQuery,
   useUsersOnProjectQuery,
-  useRemoveUserFromProjectMutation,
-  UserOnProject,
-  useMeQuery,
 } from "../generated/graphql";
 import { GraphqlProject } from "../pages/my-projects";
 import { AppError } from "../types/AppError";
 import { NETWORK_ERROR } from "../utils/texts";
-import { renderRoleName, isAdmin } from "../utils/userUtils";
+import { renderRoleName } from "../utils/userUtils";
 import {
   AddUserToProjectDialog,
   AddUserToProjectDialogResult,
 } from "./AddUserToProjectDialog";
-
-import EditIcon from "@material-ui/icons/Edit";
 import { DeleteUserOnProjectDialog } from "./DeleteUserOnProjectDialog";
 import { Loading } from "./shared/Loading";
 

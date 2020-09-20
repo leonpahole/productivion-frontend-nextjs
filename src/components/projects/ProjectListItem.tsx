@@ -14,7 +14,6 @@ import VisibilityIcon from "@material-ui/icons/Visibility";
 import { GraphqlProject } from "../../pages/my-projects";
 import { formatTimestamp } from "../../utils/dateFormat";
 import { pluralize } from "../../utils/pluralize";
-import { ButtonLink } from "../ButtonLink";
 import { useRouter } from "next/router";
 
 const useStyles = makeStyles((theme) => ({

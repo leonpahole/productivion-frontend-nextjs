@@ -1,5 +1,4 @@
 import {
-  CircularProgress,
   IconButton,
   List,
   ListItem,
@@ -10,9 +9,7 @@ import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
 import { useCommentsQuery, useMeQuery } from "../generated/graphql";
 import { GraphqlProjectCapabilities } from "../pages/my-projects";
-import { DeleteCommentDialog } from "./DeleteCommentDialog";
-import { useState } from "react";
-import { GraphqlComment } from "../utils/taskRenderingUtils";
+import { Loading } from "./shared/Loading";
 
 interface CommentListProps {
   projectId: number;
@@ -31,13 +28,15 @@ export const CommentList: React.FC<CommentListProps> = ({
     variables: { projectId, taskId },
   });
 
+  /*
   const [commentToDelete, setCommentToDelete] = useState<GraphqlComment | null>(
     null
   );
   const [deleteCommentDialogOpen, setDeleteCommentDialogOpen] = useState(false);
+    */
 
   if (loading || meLoading) {
-    return <CircularProgress />;
+    return <Loading />;
   }
 
   if (
@@ -91,7 +90,7 @@ export const CommentList: React.FC<CommentListProps> = ({
           );
         })}
       </List>
-      {capabilities.canDeleteOtherComments && (
+      {/*capabilities.canDeleteOtherComments && (
         <DeleteCommentDialog
           open={deleteCommentDialogOpen}
           projectId={projectId}
@@ -100,7 +99,7 @@ export const CommentList: React.FC<CommentListProps> = ({
             setDeleteCommentDialogOpen(false);
           }}
         />
-      )}
+        )*/}
     </>
   );
 };

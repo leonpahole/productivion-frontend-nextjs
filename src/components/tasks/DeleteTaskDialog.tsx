@@ -4,10 +4,10 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import React from "react";
-import { GraphqlTask } from "../../utils/taskRenderingUtils";
 import { useSnackbar } from "material-ui-snackbar-provider";
-import { useDeleteTaskMutation, Task } from "../../generated/graphql";
+import React from "react";
+import { useDeleteTaskMutation } from "../../generated/graphql";
+import { GraphqlTask } from "../../utils/taskRenderingUtils";
 import { NETWORK_ERROR } from "../../utils/texts";
 
 interface DeleteTaskDialogProps {

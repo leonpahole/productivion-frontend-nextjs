@@ -1,26 +1,25 @@
-import { Button, Box } from "@material-ui/core";
+import { Box, Button } from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
+import { KeyboardDatePicker } from "@material-ui/pickers";
 import { Formik } from "formik";
+import { useSnackbar } from "material-ui-snackbar-provider";
+import { useRouter } from "next/router";
 import React from "react";
 import * as Yup from "yup";
-import { MyTextInput } from "../MyTextInput";
-import { KeyboardDatePicker } from "@material-ui/pickers";
-import { DATE_FORMAT } from "../../utils/dateFormat";
-import { GraphqlTask } from "../../utils/taskRenderingUtils";
 import {
-  useCreateTaskMutation,
-  TaskSnippetFragmentDoc,
-  TasksQuery,
   TasksDocument,
+  TasksQuery,
+  useCreateTaskMutation,
 } from "../../generated/graphql";
 import { GraphqlProject } from "../../pages/my-projects";
-import { useSnackbar } from "material-ui-snackbar-provider";
+import { DATE_FORMAT } from "../../utils/dateFormat";
+import { GraphqlTask } from "../../utils/taskRenderingUtils";
 import { NETWORK_ERROR } from "../../utils/texts";
 import { ValueType } from "../../utils/valueType";
-import { useRouter } from "next/router";
+import { MyTextInput } from "../MyTextInput";
 import { TASKS_PER_PAGE } from "./TaskList";
 
 interface CreateTaskDialogProps {
