@@ -1,18 +1,17 @@
 import {
-  Drawer,
-  makeStyles,
-  Typography,
   Box,
-  Theme,
+  Drawer,
   IconButton,
-  Button,
+  makeStyles,
+  Theme,
+  Typography,
 } from "@material-ui/core";
+import CloseIcon from "@material-ui/icons/Close";
 import { GraphqlProject } from "../../pages/my-projects";
 import { GraphqlTask } from "../../utils/taskRenderingUtils";
+import { useCommonStyles } from "../../utils/useCommonStyles";
 import { CommentInput } from "./CommentInput";
 import { CommentList } from "./CommentList";
-import CloseIcon from "@material-ui/icons/Close";
-import { useCommonStyles } from "../../utils/useCommonStyles";
 
 interface CommentsDrawerProps {
   project: GraphqlProject;

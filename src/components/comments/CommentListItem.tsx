@@ -1,36 +1,31 @@
 import {
   Avatar,
-  Divider,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Tooltip,
-  IconButton,
-  ListItemSecondaryAction,
-  Menu,
-  MenuItem,
-  Typography,
   Box,
   Button,
+  Divider,
+  IconButton,
+  ListItem,
+  ListItemAvatar,
+  ListItemSecondaryAction,
+  ListItemText,
   makeStyles,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Typography,
 } from "@material-ui/core";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
+import { Formik } from "formik";
+import { useSnackbar } from "material-ui-snackbar-provider";
+import React, { useState } from "react";
+import * as Yup from "yup";
+import { useUpdateCommentMutation } from "../../generated/graphql";
+import { GraphqlProjectCapabilities } from "../../pages/my-projects";
 import { formatTimestamp } from "../../utils/dateFormat";
 import { GraphqlComment } from "../../utils/taskRenderingUtils";
-import { GraphqlProjectCapabilities } from "../../pages/my-projects";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
-import React, { useState } from "react";
-import { Formik } from "formik";
-import { COMMENTS_PER_PAGE } from "./CommentList";
-import {
-  CommentsQuery,
-  CommentsDocument,
-  useUpdateCommentMutation,
-} from "../../generated/graphql";
 import { NETWORK_ERROR } from "../../utils/texts";
-import { MyTextInput } from "../MyTextInput";
-import * as Yup from "yup";
-import { useSnackbar } from "material-ui-snackbar-provider";
 import { useCommonStyles } from "../../utils/useCommonStyles";
+import { MyTextInput } from "../MyTextInput";
 
 interface CommentListItemProps {
   comment: GraphqlComment;
@@ -153,7 +148,7 @@ export const CommentListItem: React.FC<CommentListItemProps> = ({
         />
 
         {menuVisible && (
-          <ListItemSecondaryAction className={commonStyles.commonStyles}>
+          <ListItemSecondaryAction className={commonStyles.topMenuItem}>
             <IconButton edge="end" aria-label="actions" onClick={handleClick}>
               <MoreVertIcon />
             </IconButton>

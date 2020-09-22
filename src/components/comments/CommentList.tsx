@@ -1,12 +1,12 @@
 import { Box, Fab, List, Tooltip, Typography } from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import { useState } from "react";
 import { useCommentsQuery, useMeQuery } from "../../generated/graphql";
 import { GraphqlProjectCapabilities } from "../../pages/my-projects";
+import { GraphqlComment } from "../../utils/taskRenderingUtils";
+import { DeleteCommentDialog } from "../DeleteCommentDialog";
 import { Loading } from "../shared/Loading";
 import { CommentListItem } from "./CommentListItem";
-import { GraphqlComment } from "../../utils/taskRenderingUtils";
-import { useState } from "react";
-import { DeleteCommentDialog } from "../DeleteCommentDialog";
 
 interface CommentListProps {
   projectId: number;
@@ -21,7 +21,7 @@ export const CommentList: React.FC<CommentListProps> = ({
   taskId = null,
   capabilities,
 }) => {
-  const { data: meData, loading: meLoading, error: meError } = useMeQuery();
+  const { data: meData, error: meError } = useMeQuery();
 
   const { data, loading, error, fetchMore } = useCommentsQuery({
     variables: { projectId, taskId, offset: 0, limit: COMMENTS_PER_PAGE },

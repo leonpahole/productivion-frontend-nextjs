@@ -1,16 +1,15 @@
 import {
+  Box,
   IconButton,
   ListItem,
   ListItemIcon,
   ListItemSecondaryAction,
   ListItemText,
   makeStyles,
-  MenuItem,
   Menu,
-  Box,
+  MenuItem,
 } from "@material-ui/core";
-import DeleteIcon from "@material-ui/icons/Delete";
-import EditIcon from "@material-ui/icons/Edit";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 import { useRouter } from "next/router";
 import { GraphqlProjectCapabilities } from "../../pages/my-projects";
 import {
@@ -19,9 +18,9 @@ import {
   GraphqlTask,
   renderDueDate,
 } from "../../utils/taskRenderingUtils";
-import { TaskCompleteCheckbox } from "./TaskCompleteCheckbox";
 import { useCommonStyles } from "../../utils/useCommonStyles";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import { TaskCompleteCheckbox } from "./TaskCompleteCheckbox";
+import { useState } from "react";
 
 const useStyles = makeStyles({
   completed: {
@@ -48,7 +47,7 @@ export const TaskListItem: React.FC<TaskListItemProps> = ({
   const styles = useStyles();
   const commonStyles = useCommonStyles();
 
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);

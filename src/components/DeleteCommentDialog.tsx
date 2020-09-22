@@ -1,4 +1,4 @@
-import { Button, CircularProgress } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
@@ -6,7 +6,7 @@ import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import { useSnackbar } from "material-ui-snackbar-provider";
 import React from "react";
-import { Task, useDeleteCommentMutation } from "../generated/graphql";
+import { useDeleteCommentMutation } from "../generated/graphql";
 import { GraphqlComment } from "../utils/taskRenderingUtils";
 import { NETWORK_ERROR } from "../utils/texts";
 import { Loading } from "./shared/Loading";
