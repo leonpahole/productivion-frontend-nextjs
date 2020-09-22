@@ -3,13 +3,15 @@ import { Formik } from "formik";
 import { useSnackbar } from "material-ui-snackbar-provider";
 import * as Yup from "yup";
 import {
+  CommentsDocument,
+  CommentsQuery,
   useCreateCommentMutation,
   useMeQuery,
-  CommentSnippetFragmentDoc,
-} from "../generated/graphql";
-import { NETWORK_ERROR } from "../utils/texts";
-import { MyTextInput } from "./MyTextInput";
-import { Loading } from "./shared/Loading";
+} from "../../generated/graphql";
+import { NETWORK_ERROR } from "../../utils/texts";
+import { MyTextInput } from "../MyTextInput";
+import { Loading } from "../shared/Loading";
+import { COMMENTS_PER_PAGE } from "./CommentList";
 
 interface CommentInputProps {
   projectId: number;
@@ -18,7 +20,7 @@ interface CommentInputProps {
 
 export const CommentInput: React.FC<CommentInputProps> = ({
   projectId,
-  taskId,
+  taskId = null,
 }) => {
   const snackbar = useSnackbar();
 
@@ -37,6 +39,8 @@ export const CommentInput: React.FC<CommentInputProps> = ({
   return (
     <Box>
       <Formik
+        validateOnBlur={false}
+        validateOnChange={false}
         initialValues={{
           comment: "",
         }}
@@ -55,21 +59,37 @@ export const CommentInput: React.FC<CommentInputProps> = ({
               },
               update: (cache, { data }) => {
                 if (data && data.createComment) {
-                  cache.modify({
-                    fields: {
-                      comments(existingComments = []) {
-                        const newCommentRef = cache.writeFragment({
-                          data: data.createComment,
-                          variables: {
-                            projectId,
-                            taskId,
-                          },
-                          fragment: CommentSnippetFragmentDoc,
-                          fragmentName: "CommentSnippet",
-                        });
-                        return [newCommentRef, ...existingComments];
+                  const queryVars = {
+                    projectId: projectId,
+                    taskId: taskId ? taskId : null,
+                    limit: COMMENTS_PER_PAGE,
+                    offset: 0,
+                  };
+
+                  console.log(queryVars);
+
+                  const comments = cache.readQuery<CommentsQuery>({
+                    query: CommentsDocument,
+                    variables: queryVars,
+                  });
+
+                  if (!comments) {
+                    return;
+                  }
+
+                  cache.writeQuery<CommentsQuery>({
+                    query: CommentsDocument,
+                    data: {
+                      __typename: "Query",
+                      comments: {
+                        ...comments.comments,
+                        comments: [
+                          data.createComment,
+                          ...comments.comments.comments,
+                        ],
                       },
                     },
+                    variables: queryVars,
                   });
                 }
               },
@@ -87,13 +107,12 @@ export const CommentInput: React.FC<CommentInputProps> = ({
           <form onSubmit={handleSubmit}>
             <MyTextInput
               multiline
-              rows={4}
-              label="Your comment"
+              label="Write your comment here"
               name="comment"
               type="comment"
             />
 
-            <Box mt={3}>
+            <Box mt={1} mb={3}>
               <Button
                 type="submit"
                 disabled={isSubmitting}

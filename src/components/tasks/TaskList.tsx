@@ -33,9 +33,6 @@ export const TaskList: React.FC<TaskListProps> = ({
   const [taskToDelete, setTaskToDelete] = useState<GraphqlTask | null>(null);
   const [taskToUpdate, setTaskToUpdate] = useState<GraphqlTask | null>(null);
 
-  const [updateTaskDialogOpen, setUpdateTaskDialogOpen] = useState(false);
-  const [deleteTaskDialogOpen, setDeleteTaskDialogOpen] = useState(false);
-
   if (error || !data || !data.tasks || !data.tasks.tasks) {
     if (loading) {
       return <Loading />;
@@ -71,23 +68,20 @@ export const TaskList: React.FC<TaskListProps> = ({
       >
         {data.tasks.tasks.map((task) => {
           return (
-            <>
+            <Box key={task.id}>
               <TaskListItem
-                key={task.id}
                 projectId={project.id}
                 task={task}
                 capabilities={project.capabilities}
                 onEdit={() => {
-                  setUpdateTaskDialogOpen(true);
                   setTaskToUpdate(task);
                 }}
                 onDelete={() => {
-                  setDeleteTaskDialogOpen(true);
                   setTaskToDelete(task);
                 }}
               />
               <Divider />
-            </>
+            </Box>
           );
         })}
       </List>
@@ -114,11 +108,10 @@ export const TaskList: React.FC<TaskListProps> = ({
 
       {project.capabilities.canUpdateTask && (
         <UpdateTaskDialog
-          open={updateTaskDialogOpen}
+          open={taskToUpdate != null}
           task={taskToUpdate}
           project={project}
           onClose={() => {
-            setUpdateTaskDialogOpen(false);
             setTaskToUpdate(null);
           }}
         />
@@ -126,11 +119,10 @@ export const TaskList: React.FC<TaskListProps> = ({
 
       {project.capabilities.canDeleteTask && (
         <DeleteTaskDialog
-          open={deleteTaskDialogOpen}
+          open={taskToDelete != null}
           projectId={project.id}
           task={taskToDelete}
           onClose={() => {
-            setDeleteTaskDialogOpen(false);
             setTaskToDelete(null);
           }}
         />

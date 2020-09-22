@@ -10,20 +10,25 @@ const useStyles = makeStyles((theme: Theme) => ({
     justifyContent: "center",
     marginTop: theme.spacing(18),
     padding: theme.spacing(6),
+    ["@media (max-height:850px)"]: {
+      marginTop: theme.spacing(10),
+    },
+    ["@media (max-height:750px)"]: {
+      marginTop: theme.spacing(1),
+    },
     [theme.breakpoints.down("md")]: {
       flexDirection: "column",
       marginTop: theme.spacing(5),
       alignItems: "center",
     },
     [theme.breakpoints.down("sm")]: {
-      padding: theme.spacing(4),
+      paddingTop: theme.spacing(2),
       marginTop: theme.spacing(0),
     },
-    ["@media (max-height:850px)"]: {
-      marginTop: theme.spacing(10),
-    },
-    ["@media (max-height:750px)"]: {
-      marginTop: theme.spacing(1),
+    [theme.breakpoints.down("xs")]: {
+      padding: theme.spacing(4),
+      paddingTop: theme.spacing(0),
+      marginTop: theme.spacing(0),
     },
   },
   textBox: {

@@ -5,6 +5,9 @@ import {
   ListItemSecondaryAction,
   ListItemText,
   makeStyles,
+  MenuItem,
+  Menu,
+  Box,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import EditIcon from "@material-ui/icons/Edit";
@@ -17,6 +20,8 @@ import {
   renderDueDate,
 } from "../../utils/taskRenderingUtils";
 import { TaskCompleteCheckbox } from "./TaskCompleteCheckbox";
+import { useCommonStyles } from "../../utils/useCommonStyles";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 
 const useStyles = makeStyles({
   completed: {
@@ -41,20 +46,34 @@ export const TaskListItem: React.FC<TaskListItemProps> = ({
 }) => {
   const router = useRouter();
   const styles = useStyles();
+  const commonStyles = useCommonStyles();
+
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <>
       <ListItem key={task.id}>
         <ListItemIcon>
-          <TaskCompleteCheckbox
-            capabilities={capabilities}
-            projectId={projectId}
-            task={task}
-          />
+          <Box display="flex">
+            <TaskCompleteCheckbox
+              capabilities={capabilities}
+              projectId={projectId}
+              task={task}
+            />
+          </Box>
         </ListItemIcon>
 
         <ListItemText
           primaryTypographyProps={{
+            className: commonStyles.wordWrap,
             style: {
               whiteSpace: "normal",
               textDecoration: getCompletedTextStyle(task),
@@ -75,22 +94,38 @@ export const TaskListItem: React.FC<TaskListItemProps> = ({
           className={task.completed ? styles.completed : ""}
         />
         <ListItemSecondaryAction>
-          {capabilities.canUpdateTask && (
-            <IconButton onClick={onEdit} edge="end" aria-label="edit">
-              <EditIcon />
-            </IconButton>
-          )}
+          <IconButton edge="end" aria-label="actions" onClick={handleClick}>
+            <MoreVertIcon />
+          </IconButton>
+          <Menu
+            id="simple-menu"
+            anchorEl={anchorEl}
+            keepMounted
+            open={Boolean(anchorEl)}
+            onClose={handleClose}
+          >
+            {capabilities.canUpdateTask && (
+              <MenuItem
+                onClick={() => {
+                  onEdit();
+                  handleClose();
+                }}
+              >
+                Edit
+              </MenuItem>
+            )}
 
-          {capabilities.canDeleteTask && (
-            <IconButton
-              onClick={onDelete}
-              edge="end"
-              aria-label="delete"
-              color="secondary"
-            >
-              <DeleteIcon />
-            </IconButton>
-          )}
+            {capabilities.canDeleteTask && (
+              <MenuItem
+                onClick={() => {
+                  onDelete();
+                  handleClose();
+                }}
+              >
+                Delete
+              </MenuItem>
+            )}
+          </Menu>
         </ListItemSecondaryAction>
       </ListItem>
     </>

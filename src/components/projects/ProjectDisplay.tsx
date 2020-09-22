@@ -12,6 +12,8 @@ import { CreateTaskDialog } from "../tasks/CreateTaskDialog";
 import { useCommonStyles } from "../../utils/useCommonStyles";
 import { pluralize } from "../../utils/pluralize";
 import { useRouter } from "next/router";
+import ChatIcon from "@material-ui/icons/Chat";
+import { CommentsDrawer } from "../comments/CommentsDrawer";
 
 interface ProjectDisplayProps {
   project: GraphqlProject;
@@ -31,24 +33,23 @@ export const ProjectDisplay: React.FC<ProjectDisplayProps> = ({
   const [userManagementDialogOpen, setUserManagementDialogOpen] = useState(
     false
   );
+  const [commentsDrawerOpen, setCommentsDrawerOpen] = useState(false);
 
   let subheader = null;
 
   if (showSubheader) {
     subheader = (
       <>
-        {(project.capabilities.canAddTask ||
-          project.capabilities.canManageProjectUsers ||
-          project.capabilities.canUpdateProject ||
-          project.capabilities.canDeleteProject) && (
-          <Box
-            mt={3}
-            mb={2}
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-          >
-            {project.capabilities.canAddTask && (
+        <Box
+          mt={3}
+          mb={2}
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          flexWrap="wrap"
+        >
+          {project.capabilities.canAddTask && (
+            <Box m={1}>
               <Tooltip title="Add task" placement="top">
                 <Fab
                   color="primary"
@@ -59,54 +60,67 @@ export const ProjectDisplay: React.FC<ProjectDisplayProps> = ({
                   <AddIcon />
                 </Fab>
               </Tooltip>
-            )}
+            </Box>
+          )}
 
-            {project.capabilities.canManageProjectUsers && (
-              <Box ml={2}>
-                <Tooltip title="User management" placement="top">
-                  <Fab
-                    color="primary"
-                    onClick={() => {
-                      setUserManagementDialogOpen(true);
-                    }}
-                  >
-                    <PeopleIcon />
-                  </Fab>
-                </Tooltip>
-              </Box>
-            )}
+          {project.capabilities.canManageProjectUsers && (
+            <Box m={1}>
+              <Tooltip title="User management" placement="top">
+                <Fab
+                  color="primary"
+                  onClick={() => {
+                    setUserManagementDialogOpen(true);
+                  }}
+                >
+                  <PeopleIcon />
+                </Fab>
+              </Tooltip>
+            </Box>
+          )}
 
-            {project.capabilities.canUpdateProject && (
-              <Box ml={2}>
-                <Tooltip title="Edit project" placement="top">
-                  <Fab
-                    color="primary"
-                    onClick={() => {
-                      setUpdateProjectDialogOpen(true);
-                    }}
-                  >
-                    <EditIcon />
-                  </Fab>
-                </Tooltip>
-              </Box>
-            )}
+          {project.capabilities.canUpdateProject && (
+            <Box m={1}>
+              <Tooltip title="Edit project" placement="top">
+                <Fab
+                  color="primary"
+                  onClick={() => {
+                    setUpdateProjectDialogOpen(true);
+                  }}
+                >
+                  <EditIcon />
+                </Fab>
+              </Tooltip>
+            </Box>
+          )}
 
-            {project.capabilities.canDeleteProject && (
-              <Box ml={2}>
-                <Tooltip title="Delete project" placement="top">
-                  <Fab
-                    color="secondary"
-                    onClick={() => {
-                      setDeleteProjectDialogOpen(true);
-                    }}
-                  >
-                    <DeleteIcon />
-                  </Fab>
-                </Tooltip>
-              </Box>
-            )}
+          {project.capabilities.canDeleteProject && (
+            <Box m={1}>
+              <Tooltip title="Delete project" placement="top">
+                <Fab
+                  color="secondary"
+                  onClick={() => {
+                    setDeleteProjectDialogOpen(true);
+                  }}
+                >
+                  <DeleteIcon />
+                </Fab>
+              </Tooltip>
+            </Box>
+          )}
+
+          <Box m={1}>
+            <Tooltip title="Discussion" placement="top">
+              <Fab
+                color="primary"
+                onClick={() => {
+                  setCommentsDrawerOpen(true);
+                }}
+              >
+                <ChatIcon />
+              </Fab>
+            </Tooltip>
           </Box>
-        )}
+        </Box>
 
         <Box display="flex" justifyContent="center" alignItems="center">
           <Typography align="center" color="textSecondary" variant="subtitle1">
@@ -155,6 +169,12 @@ export const ProjectDisplay: React.FC<ProjectDisplayProps> = ({
             onClose={() => setDeleteProjectDialogOpen(false)}
           />
         )}
+
+        <CommentsDrawer
+          open={commentsDrawerOpen}
+          project={project}
+          onClose={() => setCommentsDrawerOpen(false)}
+        />
       </>
     );
   }

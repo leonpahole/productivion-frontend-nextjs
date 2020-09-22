@@ -16,6 +16,7 @@ import { GraphqlTask } from "../../utils/taskRenderingUtils";
 import { NETWORK_ERROR } from "../../utils/texts";
 import { ValueType } from "../../utils/valueType";
 import { MyTextInput } from "../MyTextInput";
+import { useCommonStyles } from "../../utils/useCommonStyles";
 
 interface UpdateTaskDialogProps {
   open: boolean;
@@ -32,6 +33,8 @@ export const UpdateTaskDialog: React.FC<UpdateTaskDialogProps> = ({
 }) => {
   const snackbar = useSnackbar();
   const router = useRouter();
+
+  const commontStyles = useCommonStyles();
 
   const [updateTask, { loading: updateLoading }] = useUpdateTaskMutation();
 
@@ -53,7 +56,7 @@ export const UpdateTaskDialog: React.FC<UpdateTaskDialogProps> = ({
         aria-labelledby="form-dialog-title"
       >
         <DialogTitle id="form-dialog-title">
-          <div>Update task {task.title}</div>
+          <div className={commontStyles.wordWrap}>Update task {task.title}</div>
         </DialogTitle>
         <DialogContent>
           <Formik

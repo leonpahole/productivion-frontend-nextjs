@@ -9,4 +9,11 @@ export const useCommonStyles = makeStyles((theme) => ({
   cursorPointer: {
     cursor: "pointer",
   },
+  wordWrap: {
+    overflowWrap: "break-word",
+  },
+  topMenuItem: {
+    top: "0%",
+    marginTop: "30px",
+  },
 }));

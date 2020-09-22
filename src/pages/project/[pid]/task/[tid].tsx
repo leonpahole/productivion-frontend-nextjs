@@ -20,12 +20,16 @@ import { UpdateTaskDialog } from "../../../../components/tasks/UpdateTaskDialog"
 import { useProjectQuery, useTaskQuery } from "../../../../generated/graphql";
 import { CreateTaskDialog } from "../../../../components/tasks/CreateTaskDialog";
 import { TaskList } from "../../../../components/tasks/TaskList";
+import ChatIcon from "@material-ui/icons/Chat";
+import { CommentsDrawer } from "../../../../components/comments/CommentsDrawer";
+import { useCommonStyles } from "../../../../utils/useCommonStyles";
 
 const TaskView: NextPage<{ projectId: number; taskId: number }> = ({
   projectId,
   taskId,
 }) => {
   const router = useRouter();
+  const commonStyles = useCommonStyles();
 
   const {
     data: taskData,
@@ -46,6 +50,7 @@ const TaskView: NextPage<{ projectId: number; taskId: number }> = ({
   const [createTaskDialogOpen, setCreateTaskDialogOpen] = useState(false);
   const [editTaskDialogOpen, setEditTaskDialogOpen] = useState(false);
   const [deleteTaskDialogOpen, setDeleteTaskDialogOpen] = useState(false);
+  const [commentsDrawerOpen, setCommentsDrawerOpen] = useState(false);
 
   if (taskLoading || projectLoading) {
     return <CircularProgress />;
@@ -82,7 +87,11 @@ const TaskView: NextPage<{ projectId: number; taskId: number }> = ({
           </List>
 
           <Box ml={3} mb={2}>
-            <Typography variant="subtitle1" color="textSecondary">
+            <Typography
+              variant="subtitle1"
+              color="textSecondary"
+              className={commonStyles.wordWrap}
+            >
               {task.description}
             </Typography>
           </Box>
@@ -99,7 +108,7 @@ const TaskView: NextPage<{ projectId: number; taskId: number }> = ({
             Subtasks
           </Typography>
 
-          <Box mt={2}>
+          <Box mt={2} display="flex">
             <Tooltip title="Add subtask" placement="top">
               <Fab
                 color="primary"
@@ -110,6 +119,19 @@ const TaskView: NextPage<{ projectId: number; taskId: number }> = ({
                 <AddIcon />
               </Fab>
             </Tooltip>
+
+            <Box ml={2}>
+              <Tooltip title="Discussion" placement="top">
+                <Fab
+                  color="primary"
+                  onClick={() => {
+                    setCommentsDrawerOpen(true);
+                  }}
+                >
+                  <ChatIcon />
+                </Fab>
+              </Tooltip>
+            </Box>
           </Box>
 
           <TaskList project={project} parentTask={task} />
@@ -148,6 +170,13 @@ const TaskView: NextPage<{ projectId: number; taskId: number }> = ({
           }}
         />
       )}
+
+      <CommentsDrawer
+        open={commentsDrawerOpen}
+        project={project}
+        task={task}
+        onClose={() => setCommentsDrawerOpen(false)}
+      />
     </>
   );
 };

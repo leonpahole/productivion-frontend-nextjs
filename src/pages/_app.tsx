@@ -46,10 +46,10 @@ const theme = createMuiTheme({
 });
 
 const useStyles = makeStyles((theme) => ({
-  rootContainer: (props: any) => ({
-    marginTop: props.noMargin ? 0 : theme.spacing(5),
+  rootContainer: () => ({
+    marginTop: theme.spacing(5),
     [theme.breakpoints.down("xs")]: {
-      marginTop: props.noMargin ? 0 : theme.spacing(2),
+      marginTop: theme.spacing(2),
     },
   }),
 }));
@@ -61,14 +61,14 @@ function MyApp({ Component, pageProps }: any) {
   const router = useRouter();
   const currentRoute = router.pathname;
 
+  console.log(currentRoute);
+
   const dontShowNav = dontShowNavRoutes.some((r) => r === currentRoute);
   const nomarginOnContainer = noMarginOnContainerRoutes.some(
     (r) => r === currentRoute
   );
 
-  const styles = useStyles({
-    noMargin: nomarginOnContainer,
-  });
+  const styles = useStyles();
 
   return (
     <ThemeProvider theme={theme}>
@@ -77,7 +77,7 @@ function MyApp({ Component, pageProps }: any) {
           <ApolloProvider client={client}>
             <CssBaseline />
             {!dontShowNav && <NavBar />}
-            <Box className={styles.rootContainer}>
+            <Box className={nomarginOnContainer ? "" : styles.rootContainer}>
               <Component {...pageProps} />
             </Box>
           </ApolloProvider>

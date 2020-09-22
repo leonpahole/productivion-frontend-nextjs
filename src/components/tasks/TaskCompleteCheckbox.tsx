@@ -45,7 +45,9 @@ export const TaskCompleteCheckbox: React.FC<TaskCompleteCheckboxProps> = ({
   return (
     <Checkbox
       edge="end"
-      inputProps={{ "aria-labelledby": labelId }}
+      inputProps={{
+        "aria-labelledby": labelId,
+      }}
       checked={task.completed}
       disabled={!capabilities.canCompleteTask || loading}
       onChange={(event) =>

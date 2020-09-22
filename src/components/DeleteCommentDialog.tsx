@@ -9,6 +9,7 @@ import React from "react";
 import { Task, useDeleteCommentMutation } from "../generated/graphql";
 import { GraphqlComment } from "../utils/taskRenderingUtils";
 import { NETWORK_ERROR } from "../utils/texts";
+import { Loading } from "./shared/Loading";
 
 interface DeleteCommentDialogProps {
   open: boolean;
@@ -33,15 +34,7 @@ export const DeleteCommentDialog: React.FC<DeleteCommentDialogProps> = ({
           variables: { id: comment.id, projectId },
           update: (cache, { data }) => {
             if (data?.deleteComment) {
-              cache.modify({
-                fields: {
-                  comments(existingCommentRefs: Task[] = [], { readField }) {
-                    return existingCommentRefs.filter((taskRef) => {
-                      return comment.id !== readField("id", taskRef);
-                    });
-                  },
-                },
-              });
+              cache.evict({ id: cache.identify(comment) });
             }
           },
         });
@@ -68,7 +61,7 @@ export const DeleteCommentDialog: React.FC<DeleteCommentDialogProps> = ({
         <DialogTitle id="form-dialog-title">Confirm delete</DialogTitle>
         <DialogContent>
           {loading || !comment ? (
-            <CircularProgress />
+            <Loading />
           ) : (
             <DialogContentText>Delete comment?</DialogContentText>
           )}
@@ -78,7 +71,7 @@ export const DeleteCommentDialog: React.FC<DeleteCommentDialogProps> = ({
             onClick={() => {
               handleClose(false);
             }}
-            color="primary"
+            color="default"
             disabled={loading}
           >
             No

@@ -1,5 +1,13 @@
-query Comments($projectId: Int!, $taskId: Int) {
-  comments(projectId: $projectId, taskId: $taskId) {
-    ...CommentSnippet
+query Comments($projectId: Int!, $offset: Int!, $limit: Int!, $taskId: Int) {
+  comments(
+    projectId: $projectId
+    offset: $offset
+    limit: $limit
+    taskId: $taskId
+  ) {
+    comments {
+      ...CommentSnippet
+    }
+    hasMore
   }
 }
